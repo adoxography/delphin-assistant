@@ -57,21 +57,33 @@ contexts:
       pop: true
 
   orth-line:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
     - match: \S+(\s+\S+)*
       scope: constant.other
       set: orth-seg-line
 
   orth-seg-line:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
     - match: '[^\s-]+'
       set: [gloss-line, word2]
       scope: variable.parameter
 
   gloss-line:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
     - match: '[^\s-]+'
       set: [translation-line, word2]
       scope: variable.parameter
 
   translation-line:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
     - match: \S+(\s+\S+)*
       scope: string.quoted.double.tsdb
       pop: true
