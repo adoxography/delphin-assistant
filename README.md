@@ -20,7 +20,7 @@ To ensure that these lines are created in the correct order, the package comes w
 
 Subsequent lines are open to user customization. The LKB Assistant reads from the first line it finds in the testsuite that begins with `Lines:` to determine the number of lines that should follow the four lines mentioned earlier. By default, it will highlight any line labelled orth-seg or gloss by token, such that odd-numbered tokens are a different colour than even-numbered tokens. To adjust which lines should be token-separated, browse to `Preferences -> Package Settings -> LKB Assistant -> Settings` and in your user settings, create a key/value pair for `"tsdb_tokenized_lines"`. Note that the value must be an array.
 
-By default, tokens will be separated by whitespace and the following characters: ``!#$%&()*+,-./:;<=>?@[]^_\`{|}~\\``. These characters can be changed by adjusting the `"tsdb_split"` value in your LKB Assistant user preferences. Note that splitting on the single quote (`'`) is not supported at this time.
+By default, tokens will be separated by whitespace and the following characters: ``!#$%&()*+,-./:;<=>?@[]^_\`{|}~\``. These characters can be changed by adjusting the `"tsdb_split"` value in your LKB Assistant user preferences. Note that splitting on the single quote (`'`) is not supported at this time.
 
 ## To do
 * Add an internal sublime command for compiling testsuites
