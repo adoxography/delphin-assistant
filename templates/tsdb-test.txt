@@ -5,10 +5,7 @@ Source: ${2:a:page | author }
 Vetted: ${3:t | f | s}
 Judgment: ${4:g | u}
 Phenomena: ${5:word order}
-${6:<orth line>}
-${7:<orth-seg line>}
-${8:<gloss line>}
-${9:<translat line>}
+!!!
 ]]></content>
 <tabTrigger>test</tabTrigger>
 <description>[incr tsdb()] test</description>

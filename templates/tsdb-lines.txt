@@ -1,0 +1,36 @@
+%YAML 1.2
+---
+file_extensions:
+  - tsdbx
+scope: source.tsdbx
+contexts:
+  word:
+    - match: $
+      pop: true
+
+  word1:
+    - include: word
+    - match: (-?)([^\s-]+)
+      captures:
+        1: punctuation.separator
+        2: variable.parameter
+      set: word2
+
+  word2:
+    - include: word
+    - match: (-)?([^\s-]+)
+      captures:
+        1: punctuation.separator
+        2: storage.type
+      set: word1
+
+  comment:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
+
+  line_comment:
+    - meta_scope: comment.line.tsdb
+    - match: $
+      pop: true
+

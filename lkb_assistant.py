@@ -4,8 +4,10 @@ import re
 import shutil
 
 pwd = sublime.packages_path() + '/lkb-assistant/'
-template_file = pwd + 'lib/tsdb-lines-template.txt'
-line_syntax_file = pwd + 'tsdb-lines.sublime-syntax'
+syntax_template = pwd + 'templates/tsdb-lines.txt'
+snippet_template = pwd + 'templates/tsdb-test.txt'
+syntax_file = pwd + 'tsdb-lines.sublime-syntax'
+snippet_file = pwd + 'tsdb-test.sublime-snippet'
 
 class TsdbEventListener(sublime_plugin.EventListener):
     """
@@ -41,6 +43,7 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
 
         lines = self.generate_line_syntax(line_names, word_segmented_lines, split_chars)
         self.write_syntax(lines)
+        self.write_snippet(line_names)
 
 
     def get_line_names(self):
@@ -100,8 +103,21 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
         return lines
 
     def write_syntax(self, lines):
-        shutil.copyfile(template_file, line_syntax_file)
+        shutil.copyfile(syntax_template, syntax_file)
 
-        line_syntax = open(line_syntax_file, 'a')
+        line_syntax = open(syntax_file, 'a')
         line_syntax.write('\n'.join(lines))
         line_syntax.close()
+
+    def write_snippet(self, line_names):
+        lines = ['${' + str(i + 6) + ':<' + name + ' line>}' for i, name in enumerate(line_names)]
+
+        template = open(snippet_template)
+        data = ''.join(template.readlines())
+        template.close()
+
+        data = re.sub('!!!', '\n'.join(lines), data)
+
+        snippet = open(snippet_file, 'w')
+        snippet.write(data)
+        snippet.close()

@@ -1,5 +1,7 @@
 # Compiled line syntax
 tsdb-lines.sublime-syntax
+# Compiled snippet
+tsdb-test.sublime-snippet
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
