@@ -44,7 +44,6 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
 
         x = [word_segmented_lines, line_names, split_chars]
         if not cache == x:
-            print('compiling')
             lines = self.generate_line_syntax(line_names, word_segmented_lines, split_chars)
             self.write_syntax(lines)
             self.write_snippet(line_names)
