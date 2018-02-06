@@ -1,0 +1,106 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - tsdb
+scope: source.tsdb
+variables:
+  delimiter: '\s'
+contexts:
+  main:
+    # Comments begin with a '#' and finish at the end of the line
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
+
+    # Tests begin with a source line
+    - match: '^(Source)(:)(.*)$'
+      captures:
+        1: variable
+        2: punctuation.separator
+      set: vetted-line
+
+    # Highlight everything else loosely like JSON
+    - match: '^(\w+(\s+\w+)*)(:)(.*)\b'
+      captures:
+        1: variable
+        2: punctuation.separator
+
+  vetted-line:
+    - match: '^(Vetted)(:)(.*)$'
+      captures:
+        1: variable
+        2: punctuation.separator
+      set: judgment-line
+    - match: '^.*$'
+      scope: invalid
+      pop: true
+
+  judgment-line:
+    - match: '^(Judgment)(:)(.*)$'
+      captures:
+        1: variable
+        2: punctuation.separator
+      set: phenomena-line
+    - match: '^.*$'
+      scope: invalid
+      pop: true
+
+  phenomena-line:
+    - match: '^(Phenomena)(:)(.*)$'
+      captures:
+        1: variable
+        2: punctuation.separator
+      set: orth-line
+    - match: '^.*$'
+      scope: invalid
+      pop: true
+
+  orth-line:
+    - match: \S+(\s+\S+)*
+      scope: constant.other
+      set: orth-seg-line
+
+  orth-seg-line:
+    - match: '[^\s-]+'
+      set: [gloss-line, word2]
+      scope: variable.parameter
+
+  gloss-line:
+    - match: '[^\s-]+'
+      set: [translation-line, word2]
+      scope: variable.parameter
+
+  translation-line:
+    - match: \S+(\s+\S+)*
+      scope: string.quoted.double.tsdb
+      pop: true
+
+  word1:
+    - match: (-?)([^\s-]+)
+      captures:
+        1: punctuation.separator
+        2: variable.parameter
+      set: word2
+    - match: $
+      pop: true
+
+  word2:
+    - match: (-)?([^\s-]+)
+      captures:
+        1: punctuation.separator
+        2: storage.type
+      set: word1
+    - match: $
+      pop: true
+
+  string:
+    - meta_scope: string.quoted.double.tsdb
+    - match: \'
+      scope: punctuation.definition.string.end.tsdb
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.tsdb
+    - match: $
+      pop: true

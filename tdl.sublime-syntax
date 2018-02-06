@@ -1,0 +1,123 @@
+%YAML 1.2
+---
+file_extensions:
+  - tdl
+
+scope: source.tdl
+
+variables:
+  type: '[a-z0-9\-_+]+'
+  feature: '[A-Z][A-Z0-9\-\+]*(\.[A-Z][A-Z0-9\-\+]*)*'
+
+contexts:
+  main:
+    # Comments begin with a ';' and finish at the end of the line
+    - match: ';'
+      scope: punctuation.definition.comment.tdl
+      push: line_comment
+
+    # Any TDL needs to begin with a type
+    - match: '^({{type}})\s*((?::=)|(?::\+))'
+      captures:
+        1: entity.name.function
+        2: keyword.operator.assignment
+      push: definition_arg
+
+  line_comment:
+    - meta_scope: comment.line.tdl
+    - match: $
+      pop: true
+
+  braces:
+    - meta_scope: meta.brackets
+    - match: '{{feature}}'
+      scope: support.function.tdl
+      push: feature-value
+    - match: '&'
+      scope: keyword.operator.logical
+    - include: type
+    - match: \]
+      pop: true
+    - match: \[
+      push: braces
+    - match: ','
+      scope: punctuation.separator
+    - match: ';'
+      scope: punctuation.definition.comment.tdl
+      push: line_comment
+
+  tag:
+    - match: '#[^\s,\[\]\<\>!]+'
+      scope: variable.parameter
+
+  type:
+    - match: '{{type}}'
+      scope: string.unquoted
+
+  gen-angle-braces:
+    - meta_scope: meta.generic
+    - match: ';'
+      scope: punctuation.definition.comment.tdl
+      push: line_comment
+    - include: tag
+    - include: type
+    - match: '&'
+      scope: keyword.operator.logical
+    - match: \[
+      push: braces
+    - match: \]
+      scope: invalid
+
+  angle-braces:
+    - include: gen-angle-braces
+    - match: '>'
+      pop: true
+
+  exclam-angle-braces:
+    - include: gen-angle-braces
+    - match: '!>'
+      pop: true
+
+  feature-value:
+    - match: \[
+      set: braces
+    - match: \]
+      scope: invalid
+    - match: <!
+      set: exclam-angle-braces
+    - match: '(!>)|(>)'
+      scope: invalid
+    - match: '<'
+      set: angle-braces
+    - match: '#[^\s,\[\]\<\>!]+'
+      scope: variable.parameter
+      pop: true
+    - match: '[^\[\]\s,]+'
+      scope: string.unquoted
+      pop: true
+
+  definition_arg:
+    - match: ';'
+      scope: punctuation.definition.comment.tdl
+      push: line_comment
+    - match: '\*.+\*'
+      scope: variable.language
+      set: definition_punc
+    - match: '{{type}}'
+      scope: string.unquoted
+      set: definition_punc
+    - match: \[
+      set: [definition_punc, braces]
+    - match: \]
+      scope: invalid
+
+  definition_punc:
+    - match: '&'
+      scope: keyword.operator.logical
+      set: definition_arg
+    - match: '\.'
+      scope: keyword.operator
+      pop: true
+    - match: '\S'
+      scope: invalid
+      pop: true

@@ -1,0 +1,16 @@
+<snippet>
+<content><![CDATA[
+# ${1:Ex number and optional comment}
+Source: ${2:a:page | author }
+Vetted: ${3:t | f | s}
+Judgment: ${4:g | u}
+Phenomena: ${5:word order}
+${6:<Example in standard orthography>}
+${7:<Example with morpheme boundaries noted and morpheme forms regularized>}
+${8:<Morpheme-by-morpheme glosses>}
+${9:<Free translation>}
+]]></content>
+<tabTrigger>test</tabTrigger>
+<description>[incr tsdb()] test</description>
+<scope>source.tsdb</scope>
+</snippet>
