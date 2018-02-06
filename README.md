@@ -9,6 +9,9 @@ This package lets [Sublime Text 3](https://www.sublimetext.com/) handle file typ
 ## Usage
 At present, cloning the repository into Sublime's Packages directory will enable the plugin. After installation, all features are available in files with the extensions .tdl and .tsdb for TDL and [incr tsdb()] testsuites, respectively.
 
+![tsdb() testsuite syntax](screenshots/tsdb.png "Screenshot of [incr tsdb()] syntax highlighting")
+![tdl syntax](screenshots/tdl.png "Screenshot of tdl syntax highlighting")
+
 ### [incr tsdb()] syntax
 All [incr tsdb()] tests are expected to begin with the following four lines, in order:
 * Source
