@@ -53,58 +53,8 @@ contexts:
       captures:
         1: variable
         2: punctuation.separator
-      set: orth-line
+      set: Packages/lkb-assistant/tsdb-lines.sublime-syntax
     - include: invalid-line
-
-  orth-line:
-    - include: comment
-    - match: \S+(\s+\S+)*
-      scope: constant.other
-      set: orth-seg-line
-
-  orth-seg-line:
-    - include: comment
-    - match: '[^\s-]+'
-      set: [gloss-line, word2]
-      scope: variable.parameter
-
-  gloss-line:
-    - include: comment
-    - match: '[^\s-]+'
-      set: [translation-line, word2]
-      scope: variable.parameter
-
-  translation-line:
-    - include: comment
-    - match: \S+(\s+\S+)*
-      scope: string.quoted.double.tsdb
-      pop: true
-
-  word:
-    - match: $
-      pop: true
-
-  word1:
-    - include: word
-    - match: (-?)([^\s-]+)
-      captures:
-        1: punctuation.separator
-        2: variable.parameter
-      set: word2
-
-  word2:
-    - include: word
-    - match: (-)?([^\s-]+)
-      captures:
-        1: punctuation.separator
-        2: storage.type
-      set: word1
-
-  string:
-    - meta_scope: string.quoted.double.tsdb
-    - match: \'
-      scope: punctuation.definition.string.end.tsdb
-      pop: true
 
   comment:
     - match: '#'
