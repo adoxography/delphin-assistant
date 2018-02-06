@@ -9,9 +9,7 @@ variables:
 contexts:
   main:
     # Comments begin with a '#' and finish at the end of the line
-    - match: '#'
-      scope: punctuation.definition.comment.tsdb
-      push: line_comment
+    - include: comment
 
     # Tests begin with a source line
     - match: '^(Source)(:)(.*)$'
@@ -26,91 +24,92 @@ contexts:
         1: variable
         2: punctuation.separator
 
+  invalid-line:
+    - match: '^.*$'
+      scope: invalid
+      pop: true
+
   vetted-line:
+    - include: comment
     - match: '^(Vetted)(:)(.*)$'
       captures:
         1: variable
         2: punctuation.separator
       set: judgment-line
-    - match: '^.*$'
-      scope: invalid
-      pop: true
+    - include: invalid-line
 
   judgment-line:
+    - include: comment
     - match: '^(Judgment)(:)(.*)$'
       captures:
         1: variable
         2: punctuation.separator
       set: phenomena-line
-    - match: '^.*$'
-      scope: invalid
-      pop: true
+    - include: invalid-line
 
   phenomena-line:
+    - include: comment
     - match: '^(Phenomena)(:)(.*)$'
       captures:
         1: variable
         2: punctuation.separator
       set: orth-line
-    - match: '^.*$'
-      scope: invalid
-      pop: true
+    - include: invalid-line
 
   orth-line:
-    - match: '#'
-      scope: punctuation.definition.comment.tsdb
-      push: line_comment
+    - include: comment
     - match: \S+(\s+\S+)*
       scope: constant.other
       set: orth-seg-line
 
   orth-seg-line:
-    - match: '#'
-      scope: punctuation.definition.comment.tsdb
-      push: line_comment
+    - include: comment
     - match: '[^\s-]+'
       set: [gloss-line, word2]
       scope: variable.parameter
 
   gloss-line:
-    - match: '#'
-      scope: punctuation.definition.comment.tsdb
-      push: line_comment
+    - include: comment
     - match: '[^\s-]+'
       set: [translation-line, word2]
       scope: variable.parameter
 
   translation-line:
-    - match: '#'
-      scope: punctuation.definition.comment.tsdb
-      push: line_comment
+    - include: comment
     - match: \S+(\s+\S+)*
       scope: string.quoted.double.tsdb
       pop: true
 
+  word:
+    - match: $
+      pop: true
+
   word1:
+    - include: word
     - match: (-?)([^\s-]+)
       captures:
         1: punctuation.separator
         2: variable.parameter
       set: word2
-    - match: $
-      pop: true
 
   word2:
+    - include: word
     - match: (-)?([^\s-]+)
       captures:
         1: punctuation.separator
         2: storage.type
       set: word1
-    - match: $
-      pop: true
 
   string:
     - meta_scope: string.quoted.double.tsdb
     - match: \'
       scope: punctuation.definition.string.end.tsdb
       pop: true
+
+  comment:
+    - match: '#'
+      scope: punctuation.definition.comment.tsdb
+      push: line_comment
 
   line_comment:
     - meta_scope: comment.line.tsdb
