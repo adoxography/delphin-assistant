@@ -34,7 +34,7 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
     """
     def run(self, edit):
         settings = sublime.load_settings('lkb_assistant.sublime-settings')
-        word_segmented_lines = settings.get('tsdb_words')
+        word_segmented_lines = settings.get('tsdb_tokenized_lines')
         line_names = self.get_line_names()
         split_chars = settings.get('tsdb_split')
         split_chars = re.escape(split_chars)

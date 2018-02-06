@@ -1,4 +1,4 @@
 {
-    "tsdb_words": [ "orth-seg", "gloss" ],
-    "tsdb_split": "-"
+    "tsdb_tokenized_lines": [ "orth-seg", "gloss" ],
+    "tsdb_split": "!#$%&()*+,-./:;<=>?@[]^_`{|}~\\"
 }
