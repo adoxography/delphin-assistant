@@ -53,7 +53,7 @@ contexts:
       captures:
         1: variable
         2: punctuation.separator
-      set: Packages/lkb-assistant/tsdb-lines.sublime-syntax
+      set: Packages/User/delphin-assistant/tsdb-lines.sublime-syntax
     - include: invalid-line
 
   comment:

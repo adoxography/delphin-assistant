@@ -1,21 +1,14 @@
 import sublime
 import sublime_plugin
 import re
-import shutil
+import os
 
-syntax_template = None
-snippet_template = None
-syntax_file = None
-snippet_file = None
+delphin_folder = None
 
-def load_paths():
-    global syntax_template, snippet_template, syntax_file, snippet_file
-    pwd = sublime.packages_path() + '/delphin-assistant/'
-    syntax_template = pwd + 'templates/tsdb-lines.txt'
-    snippet_template = pwd + 'templates/tsdb-test.txt'
-    syntax_file = pwd + 'tsdb-lines.sublime-syntax'
-    snippet_file = pwd + 'tsdb-test.sublime-snippet'
-    
+
+def load_path():
+    global delphin_folder
+    delphin_folder = sublime.packages_path() + '/User/delphin-assistant/'
 
 
 class TsdbEventListener(sublime_plugin.EventListener):
@@ -44,23 +37,26 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
     Reads the current file and the package-specific settings to generate a custom line syntax highlight
     """
     def run(self, edit):
-        if syntax_template is None:
-            load_paths()
+        if delphin_folder is None:
+            load_path()
 
-        settings = sublime.load_settings('lkb_assistant.sublime-settings')
+        # Ensure that a delphin-assistant directory exists in the User directory
+        if not os.path.isdir(delphin_folder):
+            os.mkdir(delphin_folder)
+
+        settings = sublime.load_settings('delphin_assistant.sublime-settings')
         cache = settings.get('tsdb_cache')
         word_segmented_lines = settings.get('tsdb_tokenized_lines')
         line_names = self.get_line_names()
         split_chars = settings.get('tsdb_split')
         split_chars = re.escape(split_chars)
 
-        x = [word_segmented_lines, line_names, split_chars]
-        if not cache == x:
+        new_settings = [word_segmented_lines, line_names, split_chars]
+        if not cache == new_settings:
             lines = self.generate_line_syntax(line_names, word_segmented_lines, split_chars)
             self.write_syntax(lines)
             self.write_snippet(line_names)
-            settings.set('tsdb_cache', x)
-
+            settings.set('tsdb_cache', new_settings)
 
     def get_line_names(self):
         """
@@ -119,21 +115,16 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
         return lines
 
     def write_syntax(self, lines):
-        shutil.copyfile(syntax_template, syntax_file)
+        template = sublime.load_resource('Packages/delphin-assistant/templates/tsdb-lines.txt')
 
-        line_syntax = open(syntax_file, 'a')
-        line_syntax.write('\n'.join(lines))
-        line_syntax.close()
+        with open(delphin_folder + 'tsdb-lines.sublime-syntax', 'w') as line_syntax:
+            line_syntax.write(template)
+            line_syntax.write('\n'.join(lines))
 
     def write_snippet(self, line_names):
         lines = ['${' + str(i + 6) + ':<' + name + ' line>}' for i, name in enumerate(line_names)]
+        template = sublime.load_resource('Packages/delphin-assistant/templates/tsdb-test.txt')
+        template = re.sub('!!!', '\n'.join(lines), template)
 
-        template = open(snippet_template)
-        data = ''.join(template.readlines())
-        template.close()
-
-        data = re.sub('!!!', '\n'.join(lines), data)
-
-        snippet = open(snippet_file, 'w')
-        snippet.write(data)
-        snippet.close()
+        with open(delphin_folder + 'tsdb-test.sublime-snippet', 'w') as snippet:
+            snippet.write(template)
