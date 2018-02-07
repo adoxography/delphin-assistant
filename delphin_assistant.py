@@ -10,7 +10,7 @@ snippet_file = None
 
 def load_paths():
     global syntax_template, snippet_template, syntax_file, snippet_file
-    pwd = sublime.packages_path() + '/lkb-assistant/'
+    pwd = sublime.packages_path() + '/delphin-assistant/'
     syntax_template = pwd + 'templates/tsdb-lines.txt'
     snippet_template = pwd + 'templates/tsdb-test.txt'
     syntax_file = pwd + 'tsdb-lines.sublime-syntax'
