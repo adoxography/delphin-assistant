@@ -3,11 +3,20 @@ import sublime_plugin
 import re
 import shutil
 
-pwd = sublime.packages_path() + '/lkb-assistant/'
-syntax_template = pwd + 'templates/tsdb-lines.txt'
-snippet_template = pwd + 'templates/tsdb-test.txt'
-syntax_file = pwd + 'tsdb-lines.sublime-syntax'
-snippet_file = pwd + 'tsdb-test.sublime-snippet'
+syntax_template = None
+snippet_template = None
+syntax_file = None
+snippet_file = None
+
+def load_paths():
+    global syntax_template, snippet_template, syntax_file, snippet_file
+    pwd = sublime.packages_path() + '/lkb-assistant/'
+    syntax_template = pwd + 'templates/tsdb-lines.txt'
+    snippet_template = pwd + 'templates/tsdb-test.txt'
+    syntax_file = pwd + 'tsdb-lines.sublime-syntax'
+    snippet_file = pwd + 'tsdb-test.sublime-snippet'
+    
+
 
 class TsdbEventListener(sublime_plugin.EventListener):
     """
@@ -35,6 +44,9 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
     Reads the current file and the package-specific settings to generate a custom line syntax highlight
     """
     def run(self, edit):
+        if syntax_template is None:
+            load_paths()
+
         settings = sublime.load_settings('lkb_assistant.sublime-settings')
         cache = settings.get('tsdb_cache')
         word_segmented_lines = settings.get('tsdb_tokenized_lines')
