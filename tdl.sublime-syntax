@@ -6,7 +6,7 @@ file_extensions:
 scope: source.tdl
 
 variables:
-  type: '[a-z0-9\-_+]+'
+  type: '[^\s\[\]<>,&.]+'
   feature: '[A-Z][A-Z0-9\-\+]*(\.[A-Z][A-Z0-9\-\+]*)*'
 
 contexts:
@@ -50,6 +50,10 @@ contexts:
     - match: '#[^\s,\[\]\<\>!]+'
       scope: variable.parameter
 
+  string:
+    - match: '".*"'
+      scope: string.unquoted
+
   type:
     - match: '{{type}}'
       scope: string.unquoted
@@ -61,6 +65,7 @@ contexts:
       push: line_comment
     - include: tag
     - include: type
+    - include: string
     - match: '&'
       scope: keyword.operator.logical
     - match: \[
