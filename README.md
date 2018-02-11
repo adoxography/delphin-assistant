@@ -31,4 +31,4 @@ By default, tokens will be separated by whitespace and the following characters:
 ## To do
 * Add an internal sublime command for compiling testsuites
 
-*This plugin is developed and maintained independently of the DELP-IN Consortium.*
+*This plugin is developed and maintained independently of the DELPH-IN Consortium.*
