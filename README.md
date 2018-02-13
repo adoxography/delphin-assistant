@@ -11,9 +11,9 @@ At present, cloning the repository into Sublime's Packages directory will enable
 
 Assuming you have git installed, the commands for the various operating systems are:
 
-Windows: `git clone https://github.com/adoxography/delphin-assistant "%APPDATA%/Sublime Text 3"`
+Windows: `git clone https://github.com/adoxography/delphin-assistant "%APPDATA%/Sublime Text 3/Packages/"`
 
-OS X: `git clone https://github.com/adoxography/delphin-assistant "~/Library/Application Support/Sublime Text 3"`
+OS X: `git clone https://github.com/adoxography/delphin-assistant "~/Library/Application Support/Sublime Text 3/Packages/"`
 
 Linux: `git clone https://github.com/adoxography/delphin-assistant ~/.config/sublime-text-3/Packages/`
 
