@@ -6,8 +6,17 @@ This package lets [Sublime Text 3](https://www.sublimetext.com/) handle certain 
 * Commenting shortcut with `CTRL+/`
 * [incr tsdb()] test snippet
 
-## Usage
+## Installation 
 At present, cloning the repository into Sublime's Packages directory will enable the plugin. After installation, all features are available in files with the extensions .tdl and .tsdb for TDL and [incr tsdb()] testsuites, respectively.
+
+Assuming you have git installed, the commands for the various operating systems are:
+
+Windows: `git clone https://github.com/adoxography/delphin-assistant "%APPDATA%/Sublime Text 3"`
+
+OS X: `git clone https://github.com/adoxography/delphin-assistant "~/Library/Application Support/Sublime Text 3"`
+
+Linux: `git clone https://github.com/adoxography/delphin-assistant ~/.config/sublime-text-3/Packages/`
+
 
 #### [incr tsdb()] syntax:
 <img src="screenshots/tsdb.png" height=270 title="[incr tsdb()] syntax highlighting screenshot" />
