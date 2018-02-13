@@ -28,7 +28,9 @@ Subsequent lines are open to user customization. The Delphin Assistant reads fro
 
 By default, tokens will be separated by whitespace and the following characters: ``!#$%&()*+,-./:;<=>?@[]^_\`{|}~\``. These characters can be changed by adjusting the `"tsdb_split"` value in your Delphin Assistant user preferences. Note that splitting on the single quote (`'`) is not supported at this time.
 
-## To do
-* Add an internal sublime command for compiling testsuites
+### Compiling a [incr tsdb()] testsuite
+[incr tsdb()] testsuites can be compiled and added to an existing grammar from within Sublime. To compile a testsuite, press `CTRL+SHIFT+P` to open the command palette, and type 'Compile [incr tsdb()] testsuite'. You will be prompted for a folder name; if provided, the item file will be saved in this folder (relative to the [incr tsdb()] testsuite file). If not, it will be saved alongside the [incr tsdb()] testsuite. If you want any specific mappings done during compilation, override the `tsdb_make_map` setting of the Delphin Assistant package settings and add one JSON object per mapping to the array, with values specified for `from` and `to`. (An example mapping is provided in the default package settings.)
+
+You can also specify a skeleton folder within an existing grammar. If such a folder is specified, the item file will be saved relative to the skeleton folder, and all of the housekeeping (moving the Relations file, editing Index.lisp) will be taken care of for you. To specify a skeleton folder, override the `tsdb_skeleton_dir` setting of the Delphin Assistant package settings.
 
 *This plugin is developed and maintained independently of the DELPH-IN Consortium.*
