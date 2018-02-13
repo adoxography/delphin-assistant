@@ -1,4 +1,6 @@
 {
     "tsdb_tokenized_lines": [ "orth-seg", "gloss" ],
-    "tsdb_split": "!#$%&()*+,-./:;<=>?@[]^_`{|}~\\"
+    "tsdb_split": "!#$%&()*+,-./:;<=>?@[]^_`{|}~\\",
+    "tsdb_skeleton_dir": "",
+    "tsdb_make_map": ""
 }

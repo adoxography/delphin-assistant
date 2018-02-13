@@ -2,13 +2,24 @@ import sublime
 import sublime_plugin
 import re
 import os
+import shutil
+from .scripts.make_item import main as make
 
 delphin_folder = None
+package_settings = 'delphin_assistant.sublime-settings'
 
 
 def load_path():
     global delphin_folder
     delphin_folder = sublime.packages_path() + '/User/delphin-assistant/'
+
+
+def is_testsuite(file_name):
+    if file_name is not None:
+        tokens = file_name.split('.')
+        if tokens[len(tokens) - 1] == 'tsdb':
+            return True
+    return False
 
 
 class TsdbEventListener(sublime_plugin.EventListener):
@@ -25,11 +36,53 @@ class TsdbEventListener(sublime_plugin.EventListener):
         """
         Regenerates the line syntax if the current file is an [incr tsdb()] testsuite
         """
-        file_name = view.file_name()
-        if file_name is not None:
-            tokens = file_name.split('.')
-            if tokens[len(tokens) - 1] == 'tsdb':
-                view.run_command('compile_tsdb_syntax')
+        if is_testsuite(view.file_name()):
+            view.run_command('compile_tsdb_syntax')
+
+
+class CompileTsdbTestsuiteCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if is_testsuite(self.view.file_name()):
+            settings = sublime.load_settings(package_settings)
+            folder_name = settings.get('tsdb_last_folder', '')
+            self.view.window().show_input_panel("Enter a directory", folder_name, self.compile, None, None)
+        else:
+            print('This is not a [incr tsdb()] testsuite!')
+
+    def compile(self, folder_name):
+        settings = sublime.load_settings(package_settings)
+        settings.set('tsdb_last_folder', folder_name)
+        skeleton_dir = settings.get('tsdb_skeleton_dir')
+        mappings = [(mapping['from'], mapping['to']) for mapping in settings.get('tsdb_make_map')]
+        testsuite_path = self.view.file_name()
+        verb = ''
+
+        if not skeleton_dir or skeleton_dir == '':
+            skeleton_dir = '/'.join(testsuite_path.split('/')[:-1])
+
+        if not skeleton_dir[-1] == '/':
+            skeleton_dir += '/'
+
+        item_path = skeleton_dir + folder_name + '/item'
+        self.make_environment(skeleton_dir, folder_name)
+
+        make(testsuite_path, item_path, verb, mappings)
+
+    def make_environment(self, skeleton_path, folder_name):
+        if not os.path.exists(skeleton_path + folder_name):
+            os.makedirs(skeleton_path + folder_name)
+
+            if os.path.exists(skeleton_path + 'Relations'):
+                shutil.copyfile(skeleton_path + 'Relations', skeleton_path + folder_name + '/relations')
+
+            if os.path.exists(skeleton_path + 'Index.lisp'):
+                lines = None
+                with open(skeleton_path + 'Index.lisp') as index_file:
+                    lines = index_file.readlines()
+                    lines.insert(-1, '((:path . "{}") (:content . "Test suite collected for {}."))'.format(folder_name, folder_name))
+
+                with open(skeleton_path + 'Index.lisp', 'w') as index_file:
+                    index_file.write('\n'.join(lines))
 
 
 class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
@@ -44,7 +97,7 @@ class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
         if not os.path.isdir(delphin_folder):
             os.mkdir(delphin_folder)
 
-        settings = sublime.load_settings('delphin_assistant.sublime-settings')
+        settings = sublime.load_settings(package_settings)
         cache = settings.get('tsdb_cache')
         word_segmented_lines = settings.get('tsdb_tokenized_lines')
         line_names = self.get_line_names()

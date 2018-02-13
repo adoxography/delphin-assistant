@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Compile TSDB testsuite",
+        "command": "compile_tsdb_testsuite"
+    }
+]
