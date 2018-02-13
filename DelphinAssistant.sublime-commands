@@ -2,5 +2,9 @@
     {
         "caption": "Compile [incr tsdb()] testsuite",
         "command": "compile_tsdb_testsuite"
+    },
+    {
+        "caption": "Delete [incr tsdb()] testsuite",
+        "command": "remove_tsdb_testsuite"
     }
 ]

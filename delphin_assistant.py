@@ -79,10 +79,45 @@ class CompileTsdbTestsuiteCommand(sublime_plugin.TextCommand):
                 lines = None
                 with open(skeleton_path + 'Index.lisp') as index_file:
                     lines = index_file.readlines()
-                    lines.insert(-1, '((:path . "{}") (:content . "Test suite collected for {}."))'.format(folder_name, folder_name))
+                    lines.insert(-1, '((:path . "{}") (:content . "Test suite collected for {}."))\n'.format(folder_name, folder_name))
 
                 with open(skeleton_path + 'Index.lisp', 'w') as index_file:
-                    index_file.write('\n'.join(lines))
+                    index_file.write(''.join(lines))
+
+
+class RemoveTsdbTestsuiteCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        settings = sublime.load_settings(package_settings)
+        folder_name = settings.get('tsdb_last_folder', '')
+        self.view.window().show_input_panel('Which testsuite should be removed?', folder_name, self.remove, None, None)
+
+    def remove(self, folder_name):
+        settings = sublime.load_settings(package_settings)
+        skeleton_dir = settings.get('tsdb_skeleton_dir')
+
+        if not skeleton_dir or skeleton_dir == '':
+            testsuite_path = self.view.file_name()
+            skeleton_dir = '/'.join(testsuite_path.split('/')[:-1])
+
+        if not skeleton_dir[-1] == '/':
+            skeleton_dir += '/'
+
+        if folder_name != '':
+            if os.path.exists(skeleton_dir + folder_name):
+                shutil.rmtree(skeleton_dir + folder_name)
+            if os.path.exists(skeleton_dir + 'Index.lisp'):
+                lines = None
+                with open(skeleton_dir + 'Index.lisp') as index_file:
+                    lines = index_file.readlines()
+
+                for i in reversed(range(len(lines))):
+                    if 'Test suite collected for ' + folder_name in lines[i]:
+                        del lines[i]
+
+                with open(skeleton_dir + 'Index.lisp', 'w') as index_file:
+                    index_file.write(''.join(lines))
+        elif os.path.exists(skeleton_dir + 'item'):
+            os.remove(skeleton_dir + 'item')
 
 
 class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
