@@ -6,7 +6,7 @@ file_extensions:
 scope: source.tdl
 
 variables:
-  type: '[^\s\[\]<>,&.]+'
+  type: '[^\s\[\]<>,&.!]+'
   feature: '[A-Z][A-Z0-9\-\+]*(\.[A-Z][A-Z0-9\-\+]*)*'
 
 contexts:
