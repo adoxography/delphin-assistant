@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Compile TSDB testsuite",
+        "caption": "Compile [incr tsdb()] testsuite",
         "command": "compile_tsdb_testsuite"
     }
 ]
