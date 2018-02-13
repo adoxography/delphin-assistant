@@ -40,35 +40,94 @@ class TsdbEventListener(sublime_plugin.EventListener):
             view.run_command('compile_tsdb_syntax')
 
 
-class CompileTsdbTestsuiteCommand(sublime_plugin.TextCommand):
+class BaseTsdbTestsuiteCommand(sublime_plugin.TextCommand):
+    def retrieve_folder(self):
+        """
+        Retrieves the last folder that was used when compiling the current file
+
+        :return: The name of the folder cached, or an empty string if there is no cached folder
+        """
+        file_name = self.view.file_name()
+        folder_map = self.settings.get('tsdb_folder_map', {})
+        return folder_map[file_name] if file_name in folder_map else ''
+
+    def cache_folder(self, folder_name):
+        """
+        Caches a folder name along with the current file name for later use
+
+        :param folder_name: The name of folder to cache with the current file name
+        """
+        folder_map = self.settings.get('tsdb_folder_map', {})
+        folder_map[self.view.file_name()] = folder_name
+        self.settings.set('tsdb_folder_map', folder_map)
+
+    def get_skeleton_path(self):
+        """
+        Retrieves the path to the TSDB skeleton directory
+
+        :return: The path to the TSDB skeleton directory, or the path to the directory the current file is contained in
+                 if the skeleton directory is not set
+        """
+        skeleton_path = self.settings.get('tsdb_skeleton_dir')
+
+        if not skeleton_path or skeleton_path == '':
+            testsuite_path = self.view.file_name()
+            skeleton_path = '/'.join(testsuite_path.split('/')[:-1])
+
+        if not skeleton_path[-1] == '/':
+            skeleton_path += '/'
+
+        return skeleton_path
+
+
+class CompileTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
     def run(self, edit):
+        """
+        Prompts the user for a folder to store a compiled testsuite
+        """
         if is_testsuite(self.view.file_name()):
-            settings = sublime.load_settings(package_settings)
-            folder_name = settings.get('tsdb_last_folder', '')
+            self.settings = sublime.load_settings(package_settings)
+            folder_name = self.retrieve_folder()
             self.view.window().show_input_panel("Enter a directory", folder_name, self.compile, None, None)
         else:
             print('This is not a [incr tsdb()] testsuite!')
 
     def compile(self, folder_name):
-        settings = sublime.load_settings(package_settings)
-        settings.set('tsdb_last_folder', folder_name)
-        skeleton_dir = settings.get('tsdb_skeleton_dir')
-        mappings = [(mapping['from'], mapping['to']) for mapping in settings.get('tsdb_make_map')]
-        testsuite_path = self.view.file_name()
+        """
+        Compiles the current view into an item file
+        Creates the environment if necessary and possible
+
+        :param folder_name: The name of the folder to store the item file in
+        """
+        self.cache_folder(folder_name)
+
+        mappings = self.get_mappings()
         verb = ''
+        testsuite_path = self.view.file_name()
+        skeleton_path = self.get_skeleton_path()
+        item_path = skeleton_path + folder_name + '/item'
 
-        if not skeleton_dir or skeleton_dir == '':
-            skeleton_dir = '/'.join(testsuite_path.split('/')[:-1])
-
-        if not skeleton_dir[-1] == '/':
-            skeleton_dir += '/'
-
-        item_path = skeleton_dir + folder_name + '/item'
-        self.make_environment(skeleton_dir, folder_name)
+        self.make_environment(skeleton_path, folder_name)
 
         make(testsuite_path, item_path, verb, mappings)
 
+    def get_mappings(self):
+        """
+        Retrieves the compilation mappings
+
+        :return: An array of 2-tuples
+        """
+        return [(mapping['from'], mapping['to']) for mapping in self.settings.get('tsdb_make_map')]
+
     def make_environment(self, skeleton_path, folder_name):
+        """
+        Establishes the environment for a compiled testsuite if it does not exist already
+        If a Relations file is found, it is copied into the new directory, and if an Index.lisp file is found, it is
+        edited to include the new test.
+
+        :param skeleton_path: The path to the skeleton directory
+        :param folder_name: The name of the new folder
+        """
         if not os.path.exists(skeleton_path + folder_name):
             os.makedirs(skeleton_path + folder_name)
 
@@ -77,47 +136,45 @@ class CompileTsdbTestsuiteCommand(sublime_plugin.TextCommand):
 
             if os.path.exists(skeleton_path + 'Index.lisp'):
                 lines = None
+                new_line = '((:path . "{}") (:content . "Test suite collected for {}."))\n'.format(folder_name, folder_name)
                 with open(skeleton_path + 'Index.lisp') as index_file:
                     lines = index_file.readlines()
-                    lines.insert(-1, '((:path . "{}") (:content . "Test suite collected for {}."))\n'.format(folder_name, folder_name))
+                    lines.insert(-1, new_line)
 
                 with open(skeleton_path + 'Index.lisp', 'w') as index_file:
                     index_file.write(''.join(lines))
 
 
-class RemoveTsdbTestsuiteCommand(sublime_plugin.TextCommand):
+class RemoveTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
     def run(self, edit):
-        settings = sublime.load_settings(package_settings)
-        folder_name = settings.get('tsdb_last_folder', '')
+        self.settings = sublime.load_settings(package_settings)
+        folder_name = self.retrieve_folder()
         self.view.window().show_input_panel('Which testsuite should be removed?', folder_name, self.remove, None, None)
 
     def remove(self, folder_name):
-        settings = sublime.load_settings(package_settings)
-        skeleton_dir = settings.get('tsdb_skeleton_dir')
+        """
+        Removes the environment for a compiled TSDB testsuite
 
-        if not skeleton_dir or skeleton_dir == '':
-            testsuite_path = self.view.file_name()
-            skeleton_dir = '/'.join(testsuite_path.split('/')[:-1])
-
-        if not skeleton_dir[-1] == '/':
-            skeleton_dir += '/'
+        :param folder_name: The name of the folder the testsuite is stored in
+        """
+        skeleton_path = self.get_skeleton_path()
 
         if folder_name != '':
-            if os.path.exists(skeleton_dir + folder_name):
-                shutil.rmtree(skeleton_dir + folder_name)
-            if os.path.exists(skeleton_dir + 'Index.lisp'):
+            if os.path.exists(skeleton_path + folder_name):
+                shutil.rmtree(skeleton_path + folder_name)
+            if os.path.exists(skeleton_path + 'Index.lisp'):
                 lines = None
-                with open(skeleton_dir + 'Index.lisp') as index_file:
+                with open(skeleton_path + 'Index.lisp') as index_file:
                     lines = index_file.readlines()
 
                 for i in reversed(range(len(lines))):
                     if 'Test suite collected for ' + folder_name in lines[i]:
                         del lines[i]
 
-                with open(skeleton_dir + 'Index.lisp', 'w') as index_file:
+                with open(skeleton_path + 'Index.lisp', 'w') as index_file:
                     index_file.write(''.join(lines))
-        elif os.path.exists(skeleton_dir + 'item'):
-            os.remove(skeleton_dir + 'item')
+        elif os.path.exists(skeleton_path + 'item'):
+            os.remove(skeleton_path + 'item')
 
 
 class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
