@@ -20,7 +20,7 @@ contexts:
     - match: ':\S+'
       scope: keyword.control
 
-    # Any TDL needs to begin with a type
+    # Any TDL definition needs to begin with a type
     - match: '^({{type}})\s*((?::=)|(?::\+))'
       captures:
         1: entity.name.function
