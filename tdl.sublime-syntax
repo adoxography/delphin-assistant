@@ -55,6 +55,15 @@ contexts:
     - match: '#[^\s,\[\]\<\>!]+'
       scope: variable.parameter
 
+  affix:
+    - match: '(%\S+)\s*(\(\*)(.*)(\))'
+      captures:
+        1: variable.parameter
+        2: meta.parentheses
+        3: string.unquoted
+        4: meta.parentheses
+      set: definition_arg
+
   string:
     - match: '".*"'
       scope: string.unquoted
@@ -110,6 +119,7 @@ contexts:
     - match: ';'
       scope: punctuation.definition.comment.tdl
       push: line_comment
+    - include: affix
     - match: '\*.+\*'
       scope: variable.language
       set: definition_punc
