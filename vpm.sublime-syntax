@@ -1,0 +1,32 @@
+%YAML 1.2
+---
+file_extensions:
+  - vpm
+
+scope: source.vpm
+
+contexts:
+  main:
+    - match: ';'
+      scope: punctuation.definition.comment.vpm
+      push: line_comment
+
+    - match: '(\S+)\s*(:)\s*(\S+)'
+      captures:
+        1: support.function.vpm
+        2: keyword.operator.assignment
+        3: support.function.vpm
+
+    - match: '<>|<<|>>'
+      scope: key.operator.assignment
+
+    - match: '\*|\[e\]'
+      scope: keyword.control
+
+    - match: '\S+'
+      scope: string.unquoted
+
+  line_comment:
+    - meta_scope: comment.line.vpm
+    - match: $
+      pop: true
