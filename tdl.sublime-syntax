@@ -17,6 +17,9 @@ contexts:
       scope: punctuation.definition.comment.tdl
       push: line_comment
 
+    - match: ':\S+'
+      scope: keyword.control
+
     # Any TDL needs to begin with a type
     - match: '^({{type}})\s*((?::=)|(?::\+))'
       captures:
