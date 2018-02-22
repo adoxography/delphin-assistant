@@ -39,6 +39,7 @@ contexts:
       push: feature-value
     - match: '&'
       scope: keyword.operator.logical
+    - include: tag
     - include: type
     - match: \]
       pop: true
