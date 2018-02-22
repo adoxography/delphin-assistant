@@ -2,7 +2,7 @@
 This package lets [Sublime Text 3](https://www.sublimetext.com/) handle certain file types maintained by the [DELPH-IN Consortium](http://moin.delph-in.net) elegantly.
 
 ## Features
-* Syntax highlighting for TDL and [incr tsdb()] testsuites
+* Syntax highlighting for TDL, [incr tsdb()] testsuites, and VPM files
 * Commenting shortcut with `CTRL+/`
 * [incr tsdb()] test snippet
 
