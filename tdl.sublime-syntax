@@ -2,6 +2,7 @@
 ---
 file_extensions:
   - tdl
+  - mtr
 
 scope: source.tdl
 
@@ -16,7 +17,10 @@ contexts:
       scope: punctuation.definition.comment.tdl
       push: line_comment
 
-    # Any TDL needs to begin with a type
+    - match: ':\S+'
+      scope: keyword.control
+
+    # Any TDL definition needs to begin with a type
     - match: '^({{type}})\s*((?::=)|(?::\+))'
       captures:
         1: entity.name.function
@@ -35,6 +39,7 @@ contexts:
       push: feature-value
     - match: '&'
       scope: keyword.operator.logical
+    - include: tag
     - include: type
     - match: \]
       pop: true
@@ -49,6 +54,15 @@ contexts:
   tag:
     - match: '#[^\s,\[\]\<\>!]+'
       scope: variable.parameter
+
+  affix:
+    - match: '(%\S+)\s*(\(\*)(.*)(\))'
+      captures:
+        1: variable.parameter
+        2: meta.parentheses
+        3: string.unquoted
+        4: meta.parentheses
+      set: definition_arg
 
   string:
     - match: '".*"'
@@ -105,6 +119,7 @@ contexts:
     - match: ';'
       scope: punctuation.definition.comment.tdl
       push: line_comment
+    - include: affix
     - match: '\*.+\*'
       scope: variable.language
       set: definition_punc
