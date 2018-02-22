@@ -2,6 +2,7 @@
 ---
 file_extensions:
   - tdl
+  - mtr
 
 scope: source.tdl
 
