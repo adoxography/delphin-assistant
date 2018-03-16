@@ -33,6 +33,8 @@
 #      and the gloss line
 # - accepts the -m/--map option, this option modifies the
 #   default mapping into the tsdb-item fields.
+# Modified Graham Still 2/15/18:
+# - Throw an exception instead of calling sys.exit() when not called directly
 #
 #
 #
@@ -115,6 +117,10 @@ phenomena_codes = { 'adjectives':'adj',
                     'yes-noquestions':'q',
                     'yesno':'q',
                     'yesnoquestions':'q' }
+
+class MakeException(Exception):
+  '''Custom exception class for fatal make_item errors'''
+  pass
 
 def norm_phenomena(ph_str):
   '''Phenomena:  map possible forms for phenomena (lc, no whitespace)
@@ -348,14 +354,6 @@ def arg_parser(tsf,itf):
   return parser
 
 
-def main(tsf, itf, verb, lmap):
-    try:
-        make(tsf, itf, verb, lmap)
-    except:
-        if __name__ == '__main__':
-            sys.exit(1)
-
-
 def make(tsf, itf, verb, lmap):
   if itf=='':
     itf= tsf+'.item'
@@ -363,13 +361,11 @@ def make(tsf, itf, verb, lmap):
   if not lmap == None:
     for pair in lmap:
       if not pair[0] in blessed_line_names:
-        print("Error: the first item given to the map option should be a "\
+        raise MakeException("Error: the first item given to the map option should be a "\
               +"blessed line name: "+str(blessed_line_names))
-        raise Exception()
       elif not pair[1] in i_keys:
-        print("Error: the second item given to the map option should be a "\
+        raise MakeException("Error: the second item given to the map option should be a "\
               +"tsdb item field name: "+str(i_keys))
-        raise Exception()
       else:
         default_line_map[pair[1]] = pair[0]
         # update default_line_map accordingly
@@ -420,6 +416,15 @@ def make(tsf, itf, verb, lmap):
   if verb:
     print("created item file with "+str(len(items))+" examples,")
     print("                       "+str(n_grammatical)+" grammatical.")
+
+
+def main(tsf, itf, verb, lmap):
+    try:
+        make(tsf, itf, verb, lmap)
+    except MakeException as err:
+        print(err)
+        if __name__ == '__main__':
+            sys.exit(1)
 
 
 if __name__ == '__main__':
