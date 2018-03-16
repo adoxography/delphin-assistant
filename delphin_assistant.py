@@ -3,7 +3,7 @@ import sublime_plugin
 import re
 import os
 import shutil
-from .scripts.make_item import main as make
+from .scripts.make_item import main as make_item
 
 delphin_folder = None
 package_settings = 'delphin_assistant.sublime-settings'
@@ -81,6 +81,9 @@ class BaseTsdbTestsuiteCommand(sublime_plugin.TextCommand):
 
 
 class CompileTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
+    """
+    Compiles a current .tsdb file to an [incr tsdb()] testsuite
+    """
     def run(self, edit):
         """
         Prompts the user for a folder to store a compiled testsuite
@@ -99,17 +102,18 @@ class CompileTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
 
         :param folder_name: The name of the folder to store the item file in
         """
-        self.cache_folder(folder_name)
+        if folder_name:
+            self.cache_folder(folder_name)
 
-        mappings = self.get_mappings()
-        verb = ''
-        testsuite_path = self.view.file_name()
-        skeleton_path = self.get_skeleton_path()
-        item_path = skeleton_path + folder_name + '/item'
+            mappings = self.get_mappings()
+            verb = ''
+            testsuite_path = self.view.file_name()
+            skeleton_path = self.get_skeleton_path()
+            item_path = skeleton_path + folder_name + '/item'
 
-        self.make_environment(skeleton_path, folder_name)
+            self.make_environment(skeleton_path, folder_name)
 
-        make(testsuite_path, item_path, verb, mappings)
+            make_item(testsuite_path, item_path, verb, mappings)
 
     def get_mappings(self):
         """
@@ -146,35 +150,46 @@ class CompileTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
 
 
 class RemoveTsdbTestsuiteCommand(BaseTsdbTestsuiteCommand):
+    """
+    Removes a compiled [incr tsdb()] testsuite
+    """
     def run(self, edit):
         self.settings = sublime.load_settings(package_settings)
-        folder_name = self.retrieve_folder()
-        self.view.window().show_input_panel('Which testsuite should be removed?', folder_name, self.remove, None, None)
+        self.generate_delete_options();
+        self.view.window().show_quick_panel(self.options, self.remove)
 
-    def remove(self, folder_name):
+    def generate_delete_options(self):
+        """
+        Generates a list of testsuites that have been compiled and saves them to the instance
+        """
+        skeleton_path = self.get_skeleton_path();
+        self.options = [item[0] for item in list(os.walk(skeleton_path))[1:]]
+
+    def remove(self, folder_id):
         """
         Removes the environment for a compiled TSDB testsuite
 
-        :param folder_name: The name of the folder the testsuite is stored in
+        :param folder_id: The index of the folder to remove, corresponding to self.options
         """
-        skeleton_path = self.get_skeleton_path()
+        if folder_id >= 0:
+            index_path = self.get_skeleton_path() + 'Index.lisp'
+            selection_path = self.options[folder_id]
+            selection_name = selection_path.split('/')[-1]
 
-        if folder_name != '':
-            if os.path.exists(skeleton_path + folder_name):
-                shutil.rmtree(skeleton_path + folder_name)
-            if os.path.exists(skeleton_path + 'Index.lisp'):
+            if os.path.exists(selection_path):
+                shutil.rmtree(selection_path)
+
+            if os.path.exists(index_path):
                 lines = None
-                with open(skeleton_path + 'Index.lisp') as index_file:
+                with open(index_path) as index_file:
                     lines = index_file.readlines()
 
                 for i in reversed(range(len(lines))):
-                    if 'Test suite collected for ' + folder_name in lines[i]:
+                    if 'Test suite collected for ' + selection_name in lines[i]:
                         del lines[i]
 
-                with open(skeleton_path + 'Index.lisp', 'w') as index_file:
+                with open(index_path, 'w') as index_file:
                     index_file.write(''.join(lines))
-        elif os.path.exists(skeleton_path + 'item'):
-            os.remove(skeleton_path + 'item')
 
 
 class CompileTsdbSyntaxCommand(sublime_plugin.TextCommand):
