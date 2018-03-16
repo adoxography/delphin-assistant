@@ -6,23 +6,24 @@ This package lets [Sublime Text 3](https://www.sublimetext.com/) handle certain 
 * Commenting shortcut with `CTRL+/`
 * [incr tsdb()] test snippet
 
-## Installation 
-At present, cloning the repository into Sublime's Packages directory will enable the plugin. After installation, all features are available in files with the extensions .tdl and .tsdb for TDL and [incr tsdb()] testsuites, respectively.
-
-Assuming you have git installed, the commands for the various operating systems are:
-
-Windows: `git clone https://github.com/adoxography/delphin-assistant "%APPDATA%/Sublime Text 3/Packages/"`
-
-OS X: `git clone https://github.com/adoxography/delphin-assistant "~/Library/Application Support/Sublime Text 3/Packages/"`
-
-Linux: `git clone https://github.com/adoxography/delphin-assistant ~/.config/sublime-text-3/Packages/`
-
-
-#### [incr tsdb()] syntax:
+### [incr tsdb()] syntax:
 <img src="screenshots/tsdb.png" height=270 title="[incr tsdb()] syntax highlighting screenshot" />
 
-#### TDL syntax:
+### TDL syntax:
 <img src="screenshots/tdl.png" height=230 title="TDL syntax highlighting screenshot" />
+
+## Installation
+The recommended installation method is to use Sublime's [Package Control](https://packagecontrol.io/).
+
+The package can also be installed directly; assuming you have git installed, the commands for the various operating systems are:
+
+* Windows: `git clone https://github.com/adoxography/delphin-assistant "%APPDATA%/Sublime Text 3/Packages/"`
+* OS X: `git clone https://github.com/adoxography/delphin-assistant "~/Library/Application Support/Sublime Text 3/Packages/"`
+* Linux: `git clone https://github.com/adoxography/delphin-assistant ~/.config/sublime-text-3/Packages/`
+
+After installation, all relevant features are available in files with the extensions .tdl, .vpm, and .tsdb for TDL files, VPM files, and [incr tsdb()] testsuites, respectively.
+
+## Usage
 
 ### [incr tsdb()] syntax
 All [incr tsdb()] tests are expected to begin with the following four lines, in order:
