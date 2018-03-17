@@ -34,6 +34,8 @@
 # - accepts the -m/--map option, this option modifies the
 #   default mapping into the tsdb-item fields.
 # Modified Graham Still 2/15/18:
+# - Move the main functionality into a function so that it can be called when
+#   used as a module
 # - Throw an exception instead of calling sys.exit() when not called directly
 #
 #
