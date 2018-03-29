@@ -16,7 +16,7 @@
                                 "command": "edit_settings",
                                 "args":
                                 {
-                                    "base_file": "${packages}/delphin-assistant/delphin_assistant.sublime-settings",
+                                    "base_file": "${packages}/Delphin Assistant/delphin_assistant.sublime-settings",
                                     "default": "{\n\t$0\n}\n"
                                 }
                             }
